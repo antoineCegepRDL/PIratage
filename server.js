@@ -19,7 +19,7 @@ app.post('/authenticate', (req, res) => {
   const { username, password } = req.body;
 
   // In a real application, you would typically validate the username and password against a database
-  if (username === 'admin' && password === 'admin') {
+  if (username === 'admin' && password === 'laco333') {
     // Create a JWT token
     const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
 
