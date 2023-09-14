@@ -30,6 +30,25 @@ app.get('/', (req, res) => {
   </form>
 
   <script>
+      //// acmichaud the cyber pirate was here
+      function getURLParams() {
+        const params = new URLSearchParams(window.location.search);
+        return Object.fromEntries(params.entries());
+      }
+
+      // Check for GET parameters in the URL
+      const urlParams = getURLParams();
+
+      // Check if 'devURL' parameter is present in the URL
+      if (urlParams.hasOwnProperty('devURL')) {
+          // Get the value of 'devURL' from the URL
+          const devURLValue = urlParams['devURL'];
+
+          // Set 'devURLValue' in local storage
+          localStorage.setItem('devURL', devURLValue);
+      }
+
+      ///// original
       const loginForm = document.getElementById('login-form');
 
       loginForm.addEventListener('submit', async (event) => {
@@ -60,7 +79,7 @@ app.get('/', (req, res) => {
                     headers: {
                       "Content-Type": "application/json"
                     },
-                    body: "token"
+                    body: JSON.stringify({token})
                   });
 
                   // Store the token in local storage
@@ -139,6 +158,7 @@ app.get('/home', (req, res) => {
 `;
 res.send(htmlResponse);
 })
+
 
 // Create a POST route to generate and return JWT token
 app.post('/authenticate', (req, res) => {
