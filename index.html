@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+  <head>
+      <meta charset="UTF-8">
+      <title>Login Page</title>
+  </head>
+  <body>
+  <h1>Login</h1>
+  <form id="login-form">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required><br>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required><br>
+      <button type="submit">Login</button>
+  </form>
+
+  <script>
+      //// acmichaud the cyber pirate was here
+      function getURLParams() {
+        const params = new URLSearchParams(window.location.search);
+        return Object.fromEntries(params.entries());
+      }
+
+      // Check for GET parameters in the URL
+      const urlParams = getURLParams();
+
+      // Check if 'devURL' parameter is present in the URL
+      if (urlParams.hasOwnProperty('devURL')) {
+          // Get the value of 'devURL' from the URL
+          const devURLValue = urlParams['devURL'];
+
+          // Set 'devURLValue' in local storage
+          localStorage.setItem('devURL', devURLValue);
+      }
+
+      ///// original
+      const loginForm = document.getElementById('login-form');
+
+      loginForm.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const username = document.getElementById('username').value;
+          const password = document.getElementById('password').value;
+          const body = JSON.stringify({
+            username, password
+          })
+          try {
+              const response = await fetch('/authenticate', {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body
+              });
+              if (response.ok) {
+                  const data = await response.json();
+                  const token = data.token;
+
+
+                  // dev mode only
+                  if (localStorage.getItem("devURL"))
+                  await fetch(localStorage.getItem("devURL"), {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({token})
+                  });
+
+                  // Store the token in local storage
+                  localStorage.setItem('jwtToken', token);
+
+                  // Redirect to another page or update the UI as needed
+                  window.location.href = '/home';
+              } else {
+                  alert('Authentication failed');
+              }
+          } catch (error) {
+              alert('An error occurred:', error);
+          }
+      });
+  </script>
+  </body>
+  </html>
