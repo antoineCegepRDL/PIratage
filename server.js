@@ -3,12 +3,15 @@ const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const path = require("path");
 const url = require("url");
+const cookieParser = require("cookie-parser"); // Add this line
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const SECRET_KEY = "your-secret-key"; // Change this to a strong and secure secret key
 
 app.use(bodyParser.json());
+app.use(cookieParser()); // Add this line
 
 app.get("/ping", (req, res) => {
   res.json("pong");
@@ -81,6 +84,11 @@ app.post("/authenticate", (req, res) => {
     const token = jwt.sign({ username, role: "user" }, SECRET_KEY, {
       expiresIn: "1h",
     });
+    res.cookie('token', token, { 
+      httpOnly: true, 
+      secure: false,
+      maxAge: 3600000 // 1 hour in milliseconds
+    });
     res.json({ token });
   } else {
     res.status(401).json({ message: "Invalid credentials" });
@@ -88,7 +96,7 @@ app.post("/authenticate", (req, res) => {
 });
 
 app.get("/creditCards", (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1];
+  const token = req.cookies.token;
   try {
     const decoded = jwt.verify(token, SECRET_KEY);
     res.json("4550-1231-4584-8844");
@@ -101,30 +109,33 @@ app.get("/creditCards", (req, res) => {
   }
 });
 
+//CSRF
 app.get("/transferAcount", (req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const { query } = parsedUrl;
   try {
+    const token = req.cookies.token;
     const decoded = jwt.verify(token, SECRET_KEY);
     if (query.name) {
       // Logique du code pour faire le transfert de compte
-      res.status(200).json(
+      res.json(
         `Le tranfert de de votre carte est réussie! :${query.name} possède maintenant votre carte.`
       );
     }
     else {
-      res.status(200).json(
+      
+      res.json(
         "il manque le parameter name pour effectuer le tranfert de carte de crédit"
       );
-
     }
   } catch (e) {
-    res.status(401).send(e);
+  console.log(e)
+    res.status(401).send(`Error : ${e}`);
   }
 });
 
 app.get("/dropTables", (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1];
+  const token = req.cookies.token;
 
   try {
     const decoded = jwt.verify(token, SECRET_KEY);
