@@ -108,13 +108,16 @@ app.get("/transferAcount", (req, res) => {
     const decoded = jwt.verify(token, SECRET_KEY);
     if (query.name) {
       // Logique du code pour faire le transfert de compte
-      res.json(
+      res.status(200).json(
         `Le tranfert de de votre carte est réussie! :${query.name} possède maintenant votre carte.`
       );
     }
-    res.json(
-      "il manque le parameter name pour effectuer le tranfert de carte de crédit"
-    );
+    else {
+      res.status(200).json(
+        "il manque le parameter name pour effectuer le tranfert de carte de crédit"
+      );
+
+    }
   } catch (e) {
     res.status(401).send(e);
   }
