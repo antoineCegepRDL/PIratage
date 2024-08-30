@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+</head>
+
+<body>
+  <h1>Welcome to the Dashboard</h1>
+  <p>This is a protected page.</p>
+
+  <button id="dropTableButton">Drop Table to init server</button>
+  <button id="creditCardButton">Ma carte de crédit</button>
+  <a href="/blog"><button>Mon blog</button></a>
+  <a href="/profile"><button>Profile</button></a>
+
+
+  <script>
+
+    const dropTableButton = document.getElementById('dropTableButton');
+    const creditCardButton = document.getElementById('creditCardButton');
+
+    // Function to make a GET request and display the response in an alert
+    const makeGetRequest = async (url) => {
+      try {
+        const response = await fetch(url, {
+          headers: new Headers({
+            // Retrieve the token from local storage
+            'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+          })
+        });
+        if (response.ok) {
+          const data = await response.json();
+          alert('Response: ' + JSON.stringify(data));
+        } else {
+          alert('Request failed with status: ' + response.status);
+        }
+      } catch (error) {
+        alert('An error occurred: ' + error.message);
+      }
+    };
+
+    // Add click event listeners to the buttons
+    dropTableButton.addEventListener('click', () => {
+      makeGetRequest('/dropTables');
+    });
+
+    creditCardButton.addEventListener('click', () => {
+      makeGetRequest('/creditCards');
+    });
+  </script>
+</body>
+
+</html>
